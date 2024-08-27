@@ -16,12 +16,19 @@ const config = {
     },
 }
 
-let platforms, player, cursors, stars;
+let platforms;
+let player;
+let cursors;
+let stars;
+let score = 0;
+let scoreText;
 
 var game = new Phaser.Game(config)
 
 function collectStar(player, star) {
     star.disableBody(true, true);
+    score += 10;
+    scoreText.setText('Score: ' + score);
 }
 
 function preload() {
@@ -38,7 +45,10 @@ function preload() {
 
 
 function create() {
+    console.log('this.add.text', this.add.text)
+
     this.add.image(0, 0, 'sky').setOrigin(0, 0);
+    scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
     platforms = this.physics.add.staticGroup();
 
     platforms.create(400, 568, 'ground').setScale(2).refreshBody();
@@ -46,9 +56,6 @@ function create() {
     platforms.create(600, 400, 'ground');
     platforms.create(50, 250, 'ground');
     platforms.create(750, 220, 'ground');
-
-
-
 
     player = this.physics.add.sprite(400, 450, 'dude');
 
@@ -73,16 +80,23 @@ function create() {
         frameRate: 10,
         repeat: -1
     });
-    this.physics.add.collider(player, platforms);
-    stars = this.physics.add.group({
-        key: 'star',
-        repeat: 11,
-        setXY: { x: 12, y: 0, stepX: 70 }
-    });
 
-    stars.children.iterate(function (child) {
-        child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-    });
+    this.physics.add.collider(player, platforms);
+
+    // Reemplazar la creación del grupo de estrellas con esto:
+    stars = this.physics.add.group();
+
+    // Crear una función para añadir una estrella
+    const addStar = (x) => {
+        const star = stars.create(x, 0, 'star');
+        star.setBounceY(0.2);
+        // star.setVelocityX(Phaser.Math.FloatBetween(-50, 50));
+    };
+
+    // Añadir estrellas con retraso
+    for (let i = 0; i < 12; i++) {
+        this.time.delayedCall(i * 100, addStar, [12 + i * 70], this);
+    }
 
     this.physics.add.collider(stars, platforms);
 
