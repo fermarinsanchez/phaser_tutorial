@@ -113,3 +113,5 @@ function update() {
         player.setVelocityY(-330);
     }
 }
+
+console.log('hola')
