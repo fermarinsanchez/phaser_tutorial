@@ -37,7 +37,17 @@ const hitBomb = (player, bomb, scene, gameOver, gameOverText, restartButton) => 
     }
 }
 
-const hitPowerUp = (player, immortal, scene) => {
+function generatePowerUp(math, immortal) {
+    console.log("Immortal",immortal)
+    let x = math.Between(10, 790);
+    let y = 0;
+    const powerUp = immortal?.create(x, y, 'immortal');
+    powerUp.setBounce(0.2);
+}
+
+
+
+const hitPowerUp = (player, immortal, scene, math) => {
     immortal.disableBody(true, true);
     scene.isImmortal = true;
     player.setTint(0x32CD32);  // Verde lima
@@ -46,6 +56,9 @@ const hitPowerUp = (player, immortal, scene) => {
         player.clearTint();
         scene.physics.add.collider(player, scene.bombs, hitBomb, null, scene);
     }, 10000);
+    //setTimeout(() => {
+        //generatePowerUp(math, immortal);
+   // }, 0);
 }
 
-export { updateRecordScore, collectStar, hitBomb, hitPowerUp }
+export { updateRecordScore, collectStar, hitBomb, hitPowerUp, generatePowerUp}

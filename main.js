@@ -1,6 +1,6 @@
 import { animations } from './animations.js';
 import { loadGameAssets } from './loadAssets.js';
-import { updateRecordScore, collectStar, hitBomb, hitPowerUp } from './helpers.js';
+import { updateRecordScore, collectStar, hitBomb, hitPowerUp, generatePowerUp } from './helpers.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -40,6 +40,8 @@ var game = new Phaser.Game(config)
 
 
 
+
+
 function preload() {
     loadGameAssets(this.load)
 }
@@ -64,14 +66,21 @@ function create() {
     platforms.create(600, 400, 'ground');
     platforms.create(50, 250, 'ground');
     platforms.create(750, 220, 'ground');
-    immortal.create(200, 450, 'immortal');
+    let x = Phaser.Math.Between(10, 790);
+    let y = 0;
+    immortal.create(x, y, 'immortal');
+    if (isImmortal) {
+        console.log("Entra")
+        immortal.create(x, y, 'immortal');  
+    }
     bombs = this.physics.add.group();
 
 
 
 
+
     // Colisiones
-    this.physics.add.collider(immortal, player, (player, immortal) => hitPowerUp(player, immortal, this), null, this);
+    this.physics.add.collider(immortal, player, (player, immortal) => hitPowerUp(player, immortal, this, Phaser.Math), null, this, );
     this.physics.add.collider(player, bombs, (player, bomb) => hitBomb(player, bomb, this, gameOver, gameOverText, restartButton), () => !this.isImmortal, this);
     this.physics.add.collider(bombs, platforms);
     this.physics.add.collider(immortal, platforms);
@@ -91,14 +100,15 @@ function create() {
         // star.setVelocityX(Phaser.Math.FloatBetween(-50, 50));
     };
 
+    
     // Añadir estrellas con retraso
     for (let i = 0; i < 1; i++) {
         this.time.delayedCall(i * 100, addStar, [12 + i * 70], this);
     }
-    // Calisiones de estrellas con el suelo
+    // Colisiones de estrellas con el suelo
     this.physics.add.collider(stars, platforms);
 
-    // Calisiones de estrellas con el jugador
+    // Colisiones de estrellas con el jugador
     this.physics.add.overlap(player, stars, (player, star) => {
         score = collectStar(player, star, stars, bombs, score, scoreText, this);
     }, null, this);
@@ -144,5 +154,3 @@ function update() {
         player.setVelocityY(-330);
     }
 }
-
-
