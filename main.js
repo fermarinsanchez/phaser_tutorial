@@ -1,3 +1,7 @@
+import { animations } from './animations.js';
+import { loadGameAssets } from './loadAssets.js';
+import { updateRecordScore, collectStar, hitBomb, hitPowerUp } from './helpers.js';
+
 const config = {
     type: Phaser.AUTO,
     width: 800,
@@ -22,69 +26,63 @@ let cursors;
 let stars;
 let score = 0;
 let scoreText;
+let recordScore = 0;
+let recordScoreText;
+let bombs;
+let gameOver = false;
+let immortal;
+let isImmortal = false;
+let gameOverText;
+let restartButton;
 
 var game = new Phaser.Game(config)
 
-function collectStar(player, star) {
-    star.disableBody(true, true);
-    score += 10;
-    scoreText.setText('Score: ' + score);
-}
+
+
 
 function preload() {
-    console.log('this', this)
-    this.load.image('sky', 'assets/sky.png');
-    this.load.image('ground', 'assets/platform.png');
-    this.load.image('star', 'assets/star.png');
-    this.load.image('bomb', 'assets/bomb.png');
-    this.load.spritesheet('dude',
-        'assets/dude.png',
-        { frameWidth: 32, frameHeight: 48 }
-    );
+    loadGameAssets(this.load)
 }
 
 
 function create() {
-    console.log('this.add.text', this.add.text)
-
+    // Reiniciar variables globales
+    score = 0;
+    recordScore = window.localStorage.getItem('recordScore') || 0;
     this.add.image(0, 0, 'sky').setOrigin(0, 0);
     scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
+    recordScoreText = this.add.text(16, 54, `Record Score: ${recordScore}`, { fontSize: '32px', fill: '#000' });
+
+
+
+    // Inicialización de items del juego
+    player = this.physics.add.sprite(400, 450, 'dude');
+    immortal = this.physics.add.group();
+    stars = this.physics.add.group();
     platforms = this.physics.add.staticGroup();
-
     platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-
     platforms.create(600, 400, 'ground');
     platforms.create(50, 250, 'ground');
     platforms.create(750, 220, 'ground');
+    immortal.create(200, 450, 'immortal');
+    bombs = this.physics.add.group();
 
-    player = this.physics.add.sprite(400, 450, 'dude');
 
+
+
+    // Colisiones
+    this.physics.add.collider(immortal, player, (player, immortal) => hitPowerUp(player, immortal, this), null, this);
+    this.physics.add.collider(player, bombs, (player, bomb) => hitBomb(player, bomb, this, gameOver, gameOverText, restartButton), () => !this.isImmortal, this);
+    this.physics.add.collider(bombs, platforms);
+    this.physics.add.collider(immortal, platforms);
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
-    this.anims.create({
-        key: 'left',
-        frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-        frameRate: 10,
-        repeat: -1
-    });
-
-    this.anims.create({
-        key: 'turn',
-        frames: [{ key: 'dude', frame: 4 }],
-        frameRate: 20
-    });
-
-    this.anims.create({
-        key: 'right',
-        frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
-        frameRate: 10,
-        repeat: -1
-    });
-
     this.physics.add.collider(player, platforms);
 
+    animations(this);
+
+
     // Reemplazar la creación del grupo de estrellas con esto:
-    stars = this.physics.add.group();
 
     // Crear una función para añadir una estrella
     const addStar = (x) => {
@@ -94,18 +92,37 @@ function create() {
     };
 
     // Añadir estrellas con retraso
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 1; i++) {
         this.time.delayedCall(i * 100, addStar, [12 + i * 70], this);
     }
-
+    // Calisiones de estrellas con el suelo
     this.physics.add.collider(stars, platforms);
 
-    this.physics.add.overlap(player, stars, collectStar, null, this);
+    // Calisiones de estrellas con el jugador
+    this.physics.add.overlap(player, stars, (player, star) => {
+        score = collectStar(player, star, stars, bombs, score, scoreText, this);
+    }, null, this);
+
+    // Crear el texto de Game Over (inicialmente oculto)
+    gameOverText = this.add.text(400, 300, 'GAME OVER', { fontSize: '64px', fill: '#000' });
+    gameOverText.setOrigin(0.5);
+    gameOverText.setVisible(false);
+
+    // Crear el botón de reinicio (inicialmente oculto)
+    restartButton = this.add.text(400, 400, 'Jugar de nuevo', { fontSize: '32px', fill: '#000', backgroundColor: '#fff', padding: { x: 10, y: 5 }, borderRadius: 10, borderWidth: 2, borderColor: '#000' });
+    restartButton.setOrigin(0.5);
+    restartButton.setInteractive({ useHandCursor: true });
+    restartButton.on('pointerdown', () => this.scene.restart());
+    restartButton.setVisible(false);
+
+
 }
+
+
 
 function update() {
     cursors = this.input.keyboard.createCursorKeys();
-
+    updateRecordScore(score, recordScore, recordScoreText)
 
     if (cursors.left.isDown) {
         player.setVelocityX(-160);
