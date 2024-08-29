@@ -1,6 +1,6 @@
 import { animations } from './animations.js';
 import { loadGameAssets } from './loadAssets.js';
-import { updateRecordScore, collectStar, hitBomb, hitPowerUp, generatePowerUp } from './helpers.js';
+import { updateRecordScore, collectStar, hitBomb, hitPowerUp } from './helpers.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -61,6 +61,7 @@ function create() {
     player = this.physics.add.sprite(400, 450, 'dude');
     immortal = this.physics.add.group();
     stars = this.physics.add.group();
+    console.log("Immortl", immortal)
     platforms = this.physics.add.staticGroup();
     platforms.create(400, 568, 'ground').setScale(2).refreshBody();
     platforms.create(600, 400, 'ground');
@@ -69,18 +70,11 @@ function create() {
     let x = Phaser.Math.Between(10, 790);
     let y = 0;
     immortal.create(x, y, 'immortal');
-    if (isImmortal) {
-        console.log("Entra")
-        immortal.create(x, y, 'immortal');  
-    }
     bombs = this.physics.add.group();
-
-
-
-
+    
 
     // Colisiones
-    this.physics.add.collider(immortal, player, (player, immortal) => hitPowerUp(player, immortal, this, Phaser.Math), null, this, );
+    this.physics.add.collider(immortal, player, (player, powerUp) => hitPowerUp(player, powerUp,immortal, this, Phaser.Math), null, this, );
     this.physics.add.collider(player, bombs, (player, bomb) => hitBomb(player, bomb, this, gameOver, gameOverText, restartButton), () => !this.isImmortal, this);
     this.physics.add.collider(bombs, platforms);
     this.physics.add.collider(immortal, platforms);
@@ -105,12 +99,17 @@ function create() {
     for (let i = 0; i < 1; i++) {
         this.time.delayedCall(i * 100, addStar, [12 + i * 70], this);
     }
+
     // Colisiones de estrellas con el suelo
     this.physics.add.collider(stars, platforms);
 
     // Colisiones de estrellas con el jugador
     this.physics.add.overlap(player, stars, (player, star) => {
         score = collectStar(player, star, stars, bombs, score, scoreText, this);
+    }, null, this);
+
+    this.physics.add.overlap(player, immortal, (player, powerUp) => {
+        hitPowerUp(player, powerUp, immortal, bombs, score, scoreText, this);
     }, null, this);
 
     // Crear el texto de Game Over (inicialmente oculto)
@@ -124,7 +123,6 @@ function create() {
     restartButton.setInteractive({ useHandCursor: true });
     restartButton.on('pointerdown', () => this.scene.restart());
     restartButton.setVisible(false);
-
 
 }
 
