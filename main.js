@@ -61,7 +61,6 @@ function create() {
     player = this.physics.add.sprite(400, 450, 'dude');
     immortal = this.physics.add.group();
     stars = this.physics.add.group();
-    console.log("Immortl", immortal)
     platforms = this.physics.add.staticGroup();
     platforms.create(400, 568, 'ground').setScale(2).refreshBody();
     platforms.create(600, 400, 'ground');

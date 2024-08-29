@@ -38,24 +38,17 @@ const hitBomb = (player, bomb, scene, gameOver, gameOverText, restartButton) => 
     }
 }
 
-    
-function generatePowerUp(math,immortal) {
-    let x = math.Between(10, 790);
-    let y = 0;
-    const powerUp = immortal?.create(x, y, 'immortal');
-    powerUp.setBounce(0.2);
-}
-
 
 
 const hitPowerUp = (player, powerUp, immortal, scene, math) => {
     powerUp.disableBody(true, true);
-    console.log("Immortal", immortal)
-    if (immortal.countActive(true) === 0) {
+    setTimeout(() => {
+        if (immortal.countActive(true) === 0) {
         immortal.children.iterate(function (child) {
             child.enableBody(true, Phaser.Math.Between(10, 790), 0, true, true);
         });
     }
+    }, 10000)
     scene.isImmortal = true;
     player.setTint(0x32CD32);  // Verde lima
     setTimeout(() => {
@@ -63,10 +56,6 @@ const hitPowerUp = (player, powerUp, immortal, scene, math) => {
         player.clearTint();
         scene.physics.add.collider(player, scene.bombs, hitBomb, null, scene);
     }, 10000);
-    
-   // setTimeout(() => {
-    //    generatePowerUp(math, immortal);
-   // }, 5000);
 }
 
 export {updateRecordScore, collectStar, hitBomb, hitPowerUp}
