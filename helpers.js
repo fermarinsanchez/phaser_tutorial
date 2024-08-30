@@ -1,3 +1,4 @@
+
 const updateRecordScore = (score, recordScore, recordScoreText) => {
     if (score > recordScore) {
         window.localStorage.setItem('recordScore', score);
@@ -37,8 +38,17 @@ const hitBomb = (player, bomb, scene, gameOver, gameOverText, restartButton) => 
     }
 }
 
-const hitPowerUp = (player, immortal, scene) => {
-    immortal.disableBody(true, true);
+
+
+const hitPowerUp = (player, powerUp, immortal, scene, math) => {
+    powerUp.disableBody(true, true);
+    setTimeout(() => {
+        if (immortal.countActive(true) === 0) {
+        immortal.children.iterate(function (child) {
+            child.enableBody(true, Phaser.Math.Between(10, 790), 0, true, true);
+        });
+    }
+    }, 10000)
     scene.isImmortal = true;
     player.setTint(0x32CD32);  // Verde lima
     setTimeout(() => {
@@ -48,4 +58,4 @@ const hitPowerUp = (player, immortal, scene) => {
     }, 10000);
 }
 
-export { updateRecordScore, collectStar, hitBomb, hitPowerUp }
+export {updateRecordScore, collectStar, hitBomb, hitPowerUp}
