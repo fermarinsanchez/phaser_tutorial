@@ -1,7 +1,7 @@
 import { animations } from './animations.js';
 import { loadGameAssets } from './loadAssets.js';
-import { updateRecordScore, collectStar, hitBomb, hitPowerUp } from './helpers.js';
-
+import { updateRecordScore, collectStar, hitBomb, hitPowerUp, generateRandomCoordinates } from './helpers.js';
+import { POWERUPS } from './constants.js';
 const config = {
     type: Phaser.AUTO,
     width: 800,
@@ -31,7 +31,7 @@ let recordScoreText;
 let bombs;
 let gameOver = false;
 let immortal;
-let isImmortal = false;
+let speedUp;
 let gameOverText;
 let restartButton;
 
@@ -61,26 +61,31 @@ function create() {
     player = this.physics.add.sprite(400, 450, 'dude');
     immortal = this.physics.add.group();
     stars = this.physics.add.group();
+    speedUp = this.physics.add.group();
     platforms = this.physics.add.staticGroup();
     platforms.create(400, 568, 'ground').setScale(2).refreshBody();
     platforms.create(600, 400, 'ground');
     platforms.create(50, 250, 'ground');
     platforms.create(750, 220, 'ground');
-    let x = Phaser.Math.Between(10, 790);
-    let y = 0;
-    immortal.create(x, y, 'immortal');
+    const [immortalX, immortalY] = generateRandomCoordinates(Phaser.Math);
+    const [speedUpX, speedUpY] = generateRandomCoordinates(Phaser.Math);
+
+    immortal.create(immortalX, immortalY, 'immortal');
+    speedUp.create(speedUpX, speedUpY, 'speedUp');
     bombs = this.physics.add.group();
-    
+
+
 
     // Colisiones
-    this.physics.add.collider(immortal, player, (player, powerUp) => hitPowerUp(player, powerUp,immortal, this, Phaser.Math), null, this, );
+    this.physics.add.collider(immortal, player, (player, powerUp) => hitPowerUp(POWERUPS.IMMORTAL, player, powerUp, immortal, this), null, this,);
+    this.physics.add.collider(speedUp, player, (player, powerUp) => hitPowerUp(POWERUPS.SPEEDUP, player, powerUp, speedUp, this), null, this,);
     this.physics.add.collider(player, bombs, (player, bomb) => hitBomb(player, bomb, this, gameOver, gameOverText, restartButton), () => !this.isImmortal, this);
     this.physics.add.collider(bombs, platforms);
     this.physics.add.collider(immortal, platforms);
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
     this.physics.add.collider(player, platforms);
-
+    this.physics.add.collider(speedUp, platforms);
     animations(this);
 
 
@@ -93,7 +98,7 @@ function create() {
         // star.setVelocityX(Phaser.Math.FloatBetween(-50, 50));
     };
 
-    
+
     // Añadir estrellas con retraso
     for (let i = 0; i < 1; i++) {
         this.time.delayedCall(i * 100, addStar, [12 + i * 70], this);
@@ -132,12 +137,12 @@ function update() {
     updateRecordScore(score, recordScore, recordScoreText)
 
     if (cursors.left.isDown) {
-        player.setVelocityX(-160);
+        player.setVelocityX(this.isSpeedUp ? -320 : -160);
 
         player.anims.play('left', true);
     }
     else if (cursors.right.isDown) {
-        player.setVelocityX(160);
+        player.setVelocityX(this.isSpeedUp ? 320 : 160);
 
         player.anims.play('right', true);
     }
