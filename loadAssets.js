@@ -15,4 +15,6 @@ export const loadGameAssets = (load) => {
         'assets/dude.png',
         { frameWidth: 32, frameHeight: 48 }
     );
+
+    load.image("speedUp", "assets/Bolt.png");
 }
