@@ -9,6 +9,8 @@ export const loadGameAssets = (load) => {
 
     load.image('immortal', 'assets/cristalv.gif');
 
+    load.image("speedUp", "assets/Bolt.png");
+
     load.spritesheet('dude',
         'assets/dude.png',
         { frameWidth: 32, frameHeight: 48 }
