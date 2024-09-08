@@ -1,4 +1,5 @@
 export const POWERUPS = {
-    IMMORTAL: 'immortal',
-    SPEEDUP: 'speedUp'
-}
+  IMMORTAL: "immortal",
+  SPEEDUP: "speedUp",
+  STOPBOMBS: "stopBombs",
+};
