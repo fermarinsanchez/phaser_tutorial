@@ -8,45 +8,27 @@ import {
   generateRandomCoordinates,
 } from "./helpers.js";
 import { POWERUPS } from "./constants.js";
+import MenuScene from './MenuScene.js';
+import MainScene from './MainScene.js';
+
+
 const config = {
   type: Phaser.AUTO,
   width: 800,
   height: 600,
-  scene: {
-    preload: preload,
-    create: create,
-    update: update,
-  },
+  scene: [MenuScene, MainScene],
   physics: {
-    default: "arcade",
+    default: 'arcade',
     arcade: {
       gravity: { y: 300 },
-      debug: false,
-    },
+      debug: false
+    }
   },
-};
+},
 
-let platforms;
-let player;
-let cursors;
-let stars;
-let score = 0;
-let scoreText;
-let recordScore = 0;
-let recordScoreText;
-let bombs;
-let gameOver = false;
-let immortal;
-let speedUp;
-let stopBombs;
-let gameOverText;
-let restartButton;
 
-var game = new Phaser.Game(config);
 
-function preload() {
-  loadGameAssets(this.load);
-}
+
 
 function create() {
   // Reiniciar variables globales
@@ -214,3 +196,6 @@ function update() {
     player.setVelocityY(-330);
   }
 }
+=======
+const game = new Phaser.Game(config)
+>>>>>>> main
