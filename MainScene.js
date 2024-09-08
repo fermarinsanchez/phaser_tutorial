@@ -25,6 +25,7 @@ let gameOverText;
 let restartButton;
 let speedUp;
 let stopBombs;
+
 class MainScene extends Phaser.Scene {
     constructor() {
         super('MainScene');
@@ -36,6 +37,7 @@ class MainScene extends Phaser.Scene {
 
     create() {
         // Reiniciar variables globales
+        this.gameOver = false;
         score = 0;
         recordScore = window.localStorage.getItem("recordScore") || 0;
         this.add.image(0, 0, "sky").setOrigin(0, 0);
@@ -65,6 +67,7 @@ class MainScene extends Phaser.Scene {
         speedUp.create(speedUpX, speedUpY, "speedUp");
         bombs = this.physics.add.group();
         this.bombs = bombs;
+        this.hitStopBombs = false;
         // Colisiones
         this.physics.add.collider(
             immortal,
@@ -179,6 +182,10 @@ class MainScene extends Phaser.Scene {
     }
 
     update() {
+        if (this.gameOver) {
+            return;
+        }
+        // console.log("gameOver", gameOver);
         cursors = this.input.keyboard.createCursorKeys();
         updateRecordScore(score, recordScore, recordScoreText);
 

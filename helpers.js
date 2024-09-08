@@ -34,14 +34,18 @@ const collectStar = (
       player.x < 400
         ? Phaser.Math.Between(400, 800)
         : Phaser.Math.Between(0, 400);
-
-    const bomb = bombs.create(x, 16, "bomb");
-    bomb.setBounce(1);
-    bomb.setCollideWorldBounds(true);
-    bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-    if (bombs.countActive(true) % 3 === 0) {
-      const [stopBombX, stopBombY] = generateRandomCoordinates(Phaser.Math);
-      stopBombs.create(stopBombX, stopBombY, "stopBombs");
+    if (!scene.hitStopBombs) {
+      const bomb = bombs.create(x, 16, "bomb");
+      bomb.setBounce(1);
+      bomb.setCollideWorldBounds(true);
+      bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+      if (
+        bombs.countActive(true) % 3 === 0 &&
+        stopBombs.countActive(true) === 0
+      ) {
+        const [stopBombX, stopBombY] = generateRandomCoordinates(Phaser.Math);
+        stopBombs.create(stopBombX, stopBombY, "stopBombs");
+      }
     }
   }
   updateRecordScore(score, scene.recordScore, scene.recordScoreText);
@@ -56,11 +60,12 @@ const hitBomb = (
   gameOverText,
   restartButton
 ) => {
+  console.log("scene", scene);
   if (!scene.isImmortal) {
     scene.physics.pause();
     player.setTint(0xff0000);
     player.anims.play("turn");
-    gameOver = true;
+    scene.gameOver = true;
     gameOverText.setVisible(true);
     restartButton.setVisible(true);
   }
@@ -72,7 +77,7 @@ function hitImmortal(scene, player) {
   setTimeout(() => {
     scene.isImmortal = false;
     player.clearTint();
-    scene.physics.add.collider(player, scene.bombs, hitBomb, null, scene);
+    // scene.physics.add.collider(player, scene.bombs, hitBomb, null, scene);
   }, 10000);
 }
 
@@ -85,6 +90,7 @@ const hitSpeedUp = (scene) => {
 
 function hitStopBombs(scene, __, group) {
   // Guardar el estado original de cada cuerpo
+  scene.hitStopBombs = true;
   scene.bombs.children.entries.forEach((bomb) => {
     bomb.body.originalVelocity = bomb.body.velocity.clone();
 
@@ -97,6 +103,7 @@ function hitStopBombs(scene, __, group) {
   scene.time.delayedCall(5000, () => {
     scene.bombs.children.entries.forEach((bomb) => {
       bomb.body.allowGravity = true;
+      scene.hitStopBombs = false;
       // Restaurar el estado original
       bomb.body.setVelocity(
         bomb.body.originalVelocity.x,
