@@ -112,7 +112,7 @@ class MainScene extends Phaser.Scene {
         };
 
         // Añadir estrellas con retraso
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < 12; i++) {
             this.time.delayedCall(i * 100, addStar, [12 + i * 70], this);
         }
 
@@ -179,33 +179,32 @@ class MainScene extends Phaser.Scene {
         restartButton.setInteractive({ useHandCursor: true });
         restartButton.on("pointerdown", () => this.scene.restart());
         restartButton.setVisible(false);
+
+        // Agregar esta línea para crear las teclas personalizadas
+        this.keys = this.input.keyboard.addKeys('A,D,W');
     }
 
     update() {
         if (this.gameOver) {
             return;
         }
-        // console.log("gameOver", gameOver);
-        cursors = this.input.keyboard.createCursorKeys();
-        updateRecordScore(score, recordScore, recordScoreText);
-
-        if (cursors.left.isDown) {
+        console.log("this.keys", this.keys);
+        if (this.keys.A.isDown) {
             player.setVelocityX(this.isSpeedUp ? -320 : -160);
-
             player.anims.play("left", true);
-        } else if (cursors.right.isDown) {
+        } else if (this.keys.D.isDown) {
             player.setVelocityX(this.isSpeedUp ? 320 : 160);
-
             player.anims.play("right", true);
         } else {
             player.setVelocityX(0);
-
             player.anims.play("turn");
         }
 
-        if (cursors.up.isDown && player.body.touching.down) {
+        if (this.keys.W.isDown && player.body.touching.down) {
             player.setVelocityY(-330);
         }
+
+        updateRecordScore(score, recordScore, recordScoreText);
     }
 }
 
