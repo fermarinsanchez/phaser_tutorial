@@ -22,12 +22,16 @@ const collectStar = (
   scene,
   stopBombs
 ) => {
+  const starSound = scene.sound.add("collectStar", { volume: 1 });
+  const bombSound = scene.sound.add("bombFalling", { volume: 0.75 });
   star.disableBody(true, true);
+  starSound.play();
   score += 10;
   scoreText.setText(`Score: ${score}`);
   if (stars.countActive(true) === 0 && !bombs?.body?.allowGravity) {
     stars.children.iterate(function (child) {
       child.enableBody(true, child.x, 0, true, true);
+      bombSound.play();
     });
 
     let x =
@@ -60,7 +64,7 @@ const hitBomb = (
   gameOverText,
   restartButton
 ) => {
-  console.log("scene", scene);
+  const gameOverSound = scene.sound.add("gameOverSound", { volume: 0.75 });
   if (!scene.isImmortal) {
     scene.physics.pause();
     player.setTint(0xff0000);
@@ -68,6 +72,7 @@ const hitBomb = (
     scene.gameOver = true;
     gameOverText.setVisible(true);
     restartButton.setVisible(true);
+    gameOverSound.play();
   }
 };
 
@@ -127,6 +132,8 @@ const powerUps = {
 };
 
 const hitPowerUp = (key, player, powerUp, powerUpGroup, scene) => {
+  const powerUpSound = scene.sound.add("collectPowerUp", { volume: 0.75 });
+  powerUpSound.play();
   powerUp.disableBody(true, true);
   if (key !== "stopBombs") {
     setTimeout(() => {
