@@ -80,10 +80,21 @@ function hitImmortal(scene, player) {
   scene.isImmortal = true;
   player.setTint(0x32cd32); // Verde lima
   setTimeout(() => {
-    scene.isImmortal = false;
     player.clearTint();
-    // scene.physics.add.collider(player, scene.bombs, hitBomb, null, scene);
-  }, 10000);
+    for (let i = 0; i <= 3; i++) {
+      console.log("enntra en el for");
+      setTimeout(() => {
+        console.log("enntra en el setTimeout padre");
+        player.setTint(0x32cd32);
+        setTimeout(() => {
+          console.log("enntra en el setTimeout hijo");
+
+          player.clearTint();
+        }, 200);
+      }, 200);
+    }
+    scene.isImmortal = false;
+  }, 7000);
 }
 
 const hitSpeedUp = (scene) => {
