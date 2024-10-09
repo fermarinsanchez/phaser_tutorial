@@ -7,7 +7,7 @@ const updateRecordScore = (score, recordScore, recordScoreText) => {
 };
 
 const generateRandomCoordinates = (math) => {
-  let x = math.Between(10, 790);
+  let x = math.Between(10, 1590);
   let y = 0;
   return [x, y];
 };
