@@ -42,6 +42,8 @@ class MainScene extends Phaser.Scene {
     recordScore = window.localStorage.getItem("recordScore") || 0;
     this.add.image(0, 0, "sky").setOrigin(0, 0);
     this.add.image(800, 0, "sky").setOrigin(0, 0);
+    this.add.image(0, -600, "sky").setOrigin(0, 0).setFlipY(true);
+    this.add.image(800, -600, "sky").setOrigin(0, 0).setFlipY(true);
     scoreText = this.add
       .text(16, 16, "Score: 0", {
         fontSize: "32px",
@@ -66,6 +68,8 @@ class MainScene extends Phaser.Scene {
     platforms.create(600, 400, "ground");
     platforms.create(50, 250, "ground");
     platforms.create(1350, 400, "ground");
+    platforms.create(1350, 75, "ground");
+    platforms.create(650, 0, "ground");
     platforms.create(750, 220, "ground");
     const [immortalX, immortalY] = generateRandomCoordinates(Phaser.Math);
     const [speedUpX, speedUpY] = generateRandomCoordinates(Phaser.Math);
@@ -108,15 +112,15 @@ class MainScene extends Phaser.Scene {
     this.physics.add.collider(speedUp, platforms);
     this.physics.add.collider(stopBombs, platforms);
     animations(this);
-    this.physics.world.setBounds(0, 0, 1600, 600);
-    this.cameras.main.setBounds(0, 0, 1600, 0);
+    this.physics.world.setBounds(0, -400, 1600, 1200);
+    this.cameras.main.setBounds(0, -600, 1600, 1200);
     this.cameras.main.startFollow(player);
 
     // Reemplazar la creación del grupo de estrellas con esto:
 
     // Crear una función para añadir una estrella
     const addStar = (x) => {
-      const star = stars.create(x, 0, "star");
+      const star = stars.create(x, -200, "star");
       star.setBounceY(0.2);
       // star.setVelocityX(Phaser.Math.FloatBetween(-50, 50));
     };
@@ -201,6 +205,7 @@ class MainScene extends Phaser.Scene {
     if (this.gameOver) {
       return;
     }
+
     if (this.keys.A.isDown) {
       player.setVelocityX(this.isSpeedUp ? -320 : -160);
       player.anims.play("left", true);

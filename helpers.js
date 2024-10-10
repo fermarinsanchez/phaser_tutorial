@@ -85,7 +85,6 @@ function hitImmortal(scene, player) {
       player.setTint(player.tintTopLeft === 0x32cd32 ? 0xffffff : 0x32cd32);
     }, 300);
   }, 4000);
-
   setTimeout(() => {
     clearInterval(blinkInterval);
     player.clearTint();
