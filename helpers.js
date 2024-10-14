@@ -7,7 +7,7 @@ const updateRecordScore = (score, recordScore, recordScoreText) => {
 };
 
 const generateRandomCoordinates = (math) => {
-  let x = math.Between(10, 790);
+  let x = math.Between(10, 1590);
   let y = 0;
   return [x, y];
 };
@@ -78,12 +78,19 @@ const hitBomb = (
 
 function hitImmortal(scene, player) {
   scene.isImmortal = true;
-  player.setTint(0x32cd32); // Verde lima
+  player.setTint(0x32cd32);
+  let blinkInterval;
   setTimeout(() => {
-    scene.isImmortal = false;
+    blinkInterval = setInterval(() => {
+      player.setTint(player.tintTopLeft === 0x32cd32 ? 0xffffff : 0x32cd32);
+    }, 300);
+  }, 4000);
+
+  setTimeout(() => {
+    clearInterval(blinkInterval);
     player.clearTint();
-    // scene.physics.add.collider(player, scene.bombs, hitBomb, null, scene);
-  }, 10000);
+    scene.isImmortal = false;
+  }, 7000);
 }
 
 const hitSpeedUp = (scene) => {

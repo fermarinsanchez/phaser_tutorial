@@ -11,7 +11,7 @@ class MenuScene extends Phaser.Scene {
 
   create() {
     // Fondo negro
-    this.add.image(0, 0, 'background').setScale(2).setOrigin(0, 0);
+    this.add.image(0, 0, "background").setScale(2).setOrigin(0, 0);
 
     // const graphics = this.add.graphics();
     // graphics.fillStyle(0x000000, 1);
